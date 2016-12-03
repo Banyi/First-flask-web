@@ -7,6 +7,7 @@ from app.main import main
 from .forms import NameForm
 from app import db
 from app.models import User, Role
+from app.auth import auth
 
 
 @main.route('/', methods=['GET', 'POST'])
@@ -14,7 +15,6 @@ def index():
     form = NameForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.name.data).first()
-        # user = User(username=form.name.data)
         if user is None:
             user = User(username=form.name.data)
             db.session.add(user)
@@ -33,5 +33,9 @@ def index():
 
 @main.route('/user/<name>')
 def user(name):
-    # return '<h1>Hello %s!</h1>' % name
     return render_template('user.html', name=name)
+
+
+@auth.route('/login')
+def login():
+    return render_template('auth/login.html')
