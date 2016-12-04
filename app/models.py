@@ -40,6 +40,12 @@ class User(UserMixin, db.Model):
         return '<User %r>' % self.username
 
 
+
 @login_manager.user_loader
 def load_user(user_id):
+    """
+    通过回调加载用户
+    :param user_id:
+    :return:
+    """
     return User.query.get(int(user_id))

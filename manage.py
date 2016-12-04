@@ -8,6 +8,7 @@ from flask_script import Manager, Shell
 from flask_migrate import Migrate, MigrateCommand
 from flask import g
 from contextlib import closing
+from app import login_manager
 
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
 manager = Manager(app)
@@ -40,3 +41,4 @@ def test():
 
 if __name__ == '__main__':
     manager.run()
+    # app.run(debug=True)
