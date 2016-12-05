@@ -8,6 +8,7 @@ from .forms import NameForm
 from app import db
 from app.models import User, Role
 from app.auth import auth
+from manage import app
 from app.email import send_email
 
 
