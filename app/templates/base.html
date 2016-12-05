@@ -29,7 +29,15 @@
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 {% if current_user.is_authenticated %}
-                <li><a href="{{ url_for('auth.logout') }}">Sign Out</a></li>
+                <!--<li><a href="{{ url_for('auth.logout') }}">Sign Out</a></li>-->
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Account <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="{{ url_for('auth.change_password') }}">Change Password</a></li>
+                        <li><a href="{{ url_for('auth.change_email_request') }}">Change Email</a></li>
+                        <li><a href="{{ url_for('auth.logout') }}">Sign Out</a></li>
+                    </ul>
+                </li>
                 {% else %}
                 <li><a href="{{ url_for('auth.login') }}">Sign In</a></li>
                 {% endif %}
@@ -57,16 +65,16 @@
     {% block page_content %}{% endblock %}
 
     <hr>
-    <footer id="footer" class="footer">
-        <div class="footer-left">
-            <span>&copy; 2016 BY</span>
-        </div>
-        <div class="footer-right">
-            <!-- 可插入网站介绍 -->
-            <a href="">About</a> |
-            <a href="/">Home</a>
-        </div>
-    </footer>
 </div>
+<footer id="footer" class="footer">
+    <div class="footer-left">
+        <span>&copy; 2016 BY</span>
+    </div>
+    <div class="footer-right">
+        <!-- 可插入网站介绍 -->
+        <a href="">About</a> |
+        <a href="/">Home</a>
+    </div>
+</footer>
 {% endblock %}
 </html>

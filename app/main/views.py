@@ -8,6 +8,7 @@ from .forms import NameForm
 from app import db
 from app.models import User, Role
 from app.auth import auth
+from app.email import send_email
 
 
 @main.route('/', methods=['GET', 'POST'])
@@ -19,6 +20,8 @@ def index():
             user = User(username=form.name.data)
             db.session.add(user)
             session['known'] = False
+            if app.config['FLASKY_ADMIN']:
+                send_email(app.config['FLASKY_ADMIN'], 'New User', 'mail/new_user', user=user)
         else:
             session['known'] = True
             flash('You changed the name!')

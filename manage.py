@@ -1,14 +1,11 @@
 # -*- coding: utf-8 -*-
 
 import os
-import sqlite3
 from app import create_app, db
 from app.models import User, Role
 from flask_script import Manager, Shell
 from flask_migrate import Migrate, MigrateCommand
-from flask import g
-from contextlib import closing
-from app import login_manager
+from flask_mail import Mail
 
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
 manager = Manager(app)
