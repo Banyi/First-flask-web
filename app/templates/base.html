@@ -26,6 +26,9 @@
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
                 <li><a href="/">Home</a></li>
+{#                {% if current_user.is_authenticated %}#}
+{#                <li><a href="{{ url_for('main.user', username=current_user.username) }}">Profile</a> </li>#}
+{#                {% endif %}#}
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 {% if current_user.is_authenticated %}
@@ -33,6 +36,9 @@
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">Account <b class="caret"></b></a>
                     <ul class="dropdown-menu">
+                        {% if current_user.is_authenticated %}
+                        <li><a href="{{ url_for('main.user', username=current_user.username) }}">Profile</a> </li>
+                        {% endif %}
                         <li><a href="{{ url_for('auth.change_password') }}">Change Password</a></li>
                         <li><a href="{{ url_for('auth.change_email_request') }}">Change Email</a></li>
                         <li><a href="{{ url_for('auth.logout') }}">Sign Out</a></li>
@@ -66,15 +72,14 @@
 
     <hr>
 </div>
-<footer id="footer" class="footer">
-    <div class="footer-left">
-        <span>&copy; 2016 BY</span>
+<div class="footer">
+    <div class="container">
+        <small class="pull-right">
+            &copy; 2016 BY &nbsp;|&nbsp;
+            <a href="">About</a>&nbsp;|&nbsp;
+            <a href="/">Home</a>
+        </small>
     </div>
-    <div class="footer-right">
-        <!-- 可插入网站介绍 -->
-        <a href="">About</a> |
-        <a href="/">Home</a>
-    </div>
-</footer>
+</div>
 {% endblock %}
 </html>
