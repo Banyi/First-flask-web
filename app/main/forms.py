@@ -1,23 +1,24 @@
 # -*- coding:utf-8 -*-
 
-from flask_wtf import FlaskForm
+from flask_wtf import Form
 from wtforms import StringField, SubmitField, TextAreaField, BooleanField
 from wtforms.validators import DataRequired, Length, Email, Regexp
+from flask_pagedown.fields import PageDownField
 
 
-class NameForm(FlaskForm):
+class NameForm(Form):
     name = StringField("What's you name?", validators=[DataRequired()])
     submit = SubmitField('Submit')
 
 
-class EditProfileForm(FlaskForm):
+class EditProfileForm(Form):
     name = StringField('Real name', validators=[Length(0, 64)])
     location = StringField('Location', validators=[Length(0, 64)])
     about_me = TextAreaField('About me')
     submit = SubmitField('Submit')
 
 
-class EditProfileAdminForm(FlaskForm):
+class EditProfileAdminForm(Form):
     email = StringField('Email', validators=[DataRequired(), Length(1,64), Email()])
     username = StringField('Username', validators=[DataRequired(), Length(1,64),
                                                    Regexp('^[A-Za-z][A-Za-z0-9_.]*$', 0,
@@ -46,6 +47,6 @@ class EditProfileAdminForm(FlaskForm):
             raise ValidationError('Username Already in user')
 
 
-class PostForm(FlaskForm):
-    body = TextAreaField("write down what's on your mind", validators=[DataRequired()])
+class PostForm(Form):
+    body = PageDownField("write down what's on your mind", validators=[DataRequired()])
     submit = SubmitField('Submit')

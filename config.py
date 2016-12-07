@@ -8,16 +8,24 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 
 class Config:
-    # SECRET_KEY = os.environ.get('SECRET_KEY') or 'har to guess string'  # 跨站请求伪造保护
     CSRF_ENABLED = True
+    SSL_DISABLE = False
     DATABASE = r'd:\Demo\App\flaskr.db'
-    # DATABASE = os.path.join(PROJECT_ROOT, 'tmp', 'flaskr.db')
-    SECRET_KEY = os.environ.get('SECRET_KEY') or 'har to guess string'  # 跨站请求伪造保护
+    SECRET_KEY = os.environ.get('SECRET_KEY') or 'hard to guess string'  # 跨站请求伪造保护
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
     SQLALCHEMY_TRACK_MODIFICATIONS = True
     FLASKY_MAIL_SUBJECT_PREFIX = '[flasky]'
     FLASKY_MAIL_SENDER = 'Flask Admin <flask@qq.com>'
     FLASKY_ADMIN = os.environ.get('FLASK_ADMIN')
+    MAIL_PORT = 587
+    MAIL_USE_TIL = True
+    MAIL_SERVER = 'smtp.googlemail.com'
+    MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
+    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
+    FLASKY_POSTS_PER_PAGE = 20
+    FLASKY_FOLLOWERS_PAGE = 50
+    FLASKY_COMMENTS_PER_PAGE = 30
+    FLASKY_SLOW_DB_QUERY_TIME = 0.5
 
     @staticmethod
     def init_app(app):
@@ -26,11 +34,6 @@ class Config:
 
 class DevelopmentConfig(Config):
     DEBUG = True
-    MAIL_SERVER = 'smtp.qq.com'
-    MAIL_PORT = 587
-    MAIL_USE_TLS = True
-    MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
-    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
     # 数据库URL必须保存到这个键中
     SQLALCHEMY_DATABASE_URI = os.environ.get('DEV_DATABASE_URL') or \
         'sqlite:///' + os.path.join(basedir, 'data-dev.sqlite')
