@@ -20,6 +20,13 @@ class Permission:
     ADMINISTER = 0x80      # 管理员
 
 
+class Follow(db.Model):
+    __tablename__ = 'follows'
+    follower_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
+    followed_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+
 class Role(db.Model):
     __tablename__ = 'roles'  # 表名
     # 字段定义
@@ -69,6 +76,12 @@ class User(UserMixin, db.Model):
     confirmed = db.Column(db.Boolean, default=False)
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))  # 将两个模型建立关联关系
     posts = db.relationship('Post', backref='author', lazy='dynamic')
+    followed = db.relationship('Follow', foreign_keys=[Follow.follower_id],
+                                  backref=db.backref('follower', lazy='joined'),
+                                  lazy='dynamic', cascade='all, delete-orphan')
+    followers = db.relationship('Follow', foreign_keys=[Follow.followed_id],
+                                  backref=db.backref('followed', lazy='joined'),
+                                  lazy='dynamic', cascade='all, delete-orphan')
 
     @staticmethod
     def generate_fake(count=100):
@@ -97,7 +110,23 @@ class User(UserMixin, db.Model):
             except IntegrityError:
                 db.session.rollback()
 
+    @staticmethod
+    def add_self_follows():
+        """
+        用脚本把已存在的用户设置为自己的关注者
+        :return:
+        """
+        for user in User.query.all():
+            if not user.is_following(user):
+                user.follow(self)
+                db.session.add(user)
+                db.session.commit()
+
     def __init__(self, **kwargs):
+        """
+        创建用户时将其设置为自己的关注者follow()
+        :param kwargs:
+        """
         super(User, self).__init__(**kwargs)
         if self.role is None:
             if self.email == current_app.config['FLASKY_ADMIN']:
@@ -106,6 +135,7 @@ class User(UserMixin, db.Model):
                 self.role = Role.query.filter_by(default=True).first()
         if self.email is not None and self.avatar_hash is None:
             self.avatar_hash = hashlib.md5(self.email.encode('utf-8')).hexdigest()
+        self.followed.append(Follow(followed=self))
 
     @property
     def password(self):
@@ -219,6 +249,27 @@ class User(UserMixin, db.Model):
             url=url, hash=hash, size=size, default=default, rating=rating
         )
 
+    def follow(self, user):
+        if not self.is_following(user):
+            f = Follow(follower=self, followed=user)
+            db.session.add(f)
+
+    def unfollow(self, user):
+        f = self.followed.filter_by(followed_id=user.id).first()
+        if f:
+            db.session.delete(f)
+
+    def is_following(self, user):
+        return self.followed.filter_by(followed_id=user.id).first() is not None
+
+    def is_followed_by(self, user):
+        return self.followers.filter_by(follower_id=user.id).first() is not None
+
+    @property
+    def followed_posts(self):
+        return Post.query.join(Follow, Follow.followed_id == Post.author_id) \
+            .filter(Follow.follower_id == self.id)
+
     def __repr__(self):
         return '<User %r>' % self.username
 
@@ -270,6 +321,6 @@ class Post(db.Model):
     def on_changed_body(target, value, oldvalue, initator):
         allowed_tags = ['a', 'abbr', 'acronym', 'b', 'blockquote', 'code', 'em', 'i',
                         'li', 'ol', 'pre', 'strong', 'ul', 'h1', 'h2', 'h3', 'p']
-        target.body_html = bleach.linkify(bleach.clean(markdown(value, output_format='html'),
-                                                       tags=allowed_tags, strip=True))
+        target.body_html = bleach.linkify(bleach.clean(
+            markdown(value, output_format='html'), tags=allowed_tags, strip=True))
 db.event.listen(Post.body, 'set', Post.on_changed_body)
